@@ -1,0 +1,175 @@
+\documentclass{beamer}
+\usetheme{Madrid}
+\usecolortheme{default}
+
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{xcolor}
+
+% Custom colors for pillars
+\definecolor{abstraction}{RGB}{0, 102, 204}    % Blue
+\definecolor{encapsulation}{RGB}{0, 153, 0}    % Green
+\definecolor{inheritance}{RGB}{204, 102, 0}    % Orange
+\definecolor{polymorphism}{RGB}{153, 0, 153}   % Purple
+
+% Tight spacing
+\setlength{\parskip}{0pt}
+\setlength{\itemsep}{0pt}
+\setlength{\parsep}{0pt}
+\setlength{\topsep}{0pt}
+
+\title{Object Oriented Programming in Python}
+\subtitle{A Demonstration of the Four Pillars}
+\author{Holyweek Asea}
+\institute{Student Number: 2500721983 \\[0.1cm] Makerere University}
+\date{September 1, 2026}
+
+\begin{document}
+	
+	% ======================== SLIDE 1: COVER ========================
+	\begin{frame}
+		\titlepage
+	\end{frame}
+	
+	% ======================== SLIDE 2: INTRODUCTION ========================
+	\begin{frame}{Introduction to OOP \& Why Python?}
+		
+		\textbf{What is Object Oriented Programming?}
+		\begin{itemize}
+			\item OOP models real-world entities as \textbf{objects}.
+			\item Each object has \textbf{attributes} (data) and \textbf{methods} (behavior).
+			\item Organizes code to be reusable, maintainable, and scalable.
+		\end{itemize}
+		
+		\vspace{0.1cm}
+		
+		\textbf{Why Python for OOP?}
+		\begin{itemize}
+			\item \textbf{Readable and Beginner Friendly}: Clear, simple syntax.
+			\item \textbf{Supports All OOP Principles}: Classes, inheritance, polymorphism, encapsulation, and abstraction are built-in.
+			\item \textbf{Widely Used in Statistics}: Python is the primary language for data science and statistical computing.
+		\end{itemize}
+		
+	\end{frame}
+	
+	% ======================== SLIDE 3: CODE - CLASS DEFINITIONS ========================
+	\begin{frame}[fragile]{School Grading System: Class Definitions}
+		
+		{\fontsize{5.5}{6}\selectfont
+			\begin{verbatim}
+				from abc import ABC, abstractmethod
+				
+				class Person(ABC):                        # 1. ABSTRACTION
+				def __init__(self, name, id_no):      	  #    Abstract base class hides implementation details.
+				self.name = name                  		      
+				self._id_no = id_no                 
+				
+				@abstractmethod                           #    Forces children to implement this method.
+				def display_details(self): pass          
+				
+				class Student(Person):                    # 2. INHERITANCE
+				def __init__(self, name, id_no, marks):   #    Reuse parent constructor
+				super().__init__(name, id_no)     
+				self.__marks = marks                      # 3. ENCAPSULATION
+				
+				def get_marks(self):                      #    Private attribute accessed only via getter method.
+				return self.__marks                   
+														   
+				
+				def display_details(self):                # 4. POLYMORPHISM
+				print(f"Student: {self.name}, Marks: {self.__marks}")
+				#    Same method name,
+				def calculate_grade(self):                #    different behavior for Student vs Teacher.
+				marks = self.get_marks()            
+				if marks >= 90: return "A"
+				elif marks >= 70: return "B"
+				elif marks >= 50: return "C"
+				else: return "F"
+				
+				class Teacher(Person):                    # 2. INHERITANCE
+				def __init__(self, name, id_no, subject):
+				super().__init__(name, id_no)             #    Reuse parent constructor
+				self.subject = subject
+				
+				def display_details(self):                # 4. POLYMORPHISM
+				print(f"Teacher: {self.name}, Subject: {self.subject}") #    Same method name, different output.
+				
+			\end{verbatim}
+		}
+		
+	\end{frame}
+	
+	% ======================== SLIDE 4: CODE - DEMONSTRATION & OUTPUT ========================
+	\begin{frame}[fragile]{School Grading System: Demonstration \& Output}
+		
+		{\fontsize{6}{6.5}\selectfont
+			\begin{verbatim}
+				# Create instances
+				student1 = Student("Holyweek Asea, Marks", 501, 88)
+				teacher1 = Teacher("Faith Kuli", 101, "Computer Science")
+				
+				# 4. POLYMORPHISM in action
+				people = [student1, teacher1]
+				for p in people:
+				p.display_details()      # Same method call, different output
+				
+				# 3. ENCAPSULATION in action
+				print(f"Marks: {student1.get_marks()}")   # Access via getter
+				
+				# 1. ABSTRACTION in action
+				print(f"Grade: {student1.calculate_grade()}")  # User doesn't need
+				# to know HOW it works.
+			\end{verbatim}
+		}
+		
+		\vspace{0.1cm}
+		
+		\textbf{Output:}
+		{\fontsize{6}{6.5}\selectfont
+			\begin{verbatim}
+				Student: Holyweek Asea, Marks: 88
+				Teacher: Faith Kuli, Subject: Computer Science
+				Marks: 88
+				Grade: B
+			\end{verbatim}
+		}
+		
+	\end{frame}
+	
+	% ======================== SLIDE 5: SUMMARY + REFERENCES ========================
+	\begin{frame}{The Four Pillars Demonstrated}
+		
+		\begin{center}
+			\begin{tabular}{|p{0.22\textwidth}|p{0.65\textwidth}|}
+				\hline
+				\textbf{Pillar} & \textbf{Implementation in Code} \\
+				\hline
+				\hline
+				{\color{abstraction}\textbf{Abstraction}} & \texttt{Person(ABC)} and \texttt{@abstractmethod} hide implementation details. \\
+				\hline
+				{\color{encapsulation}\textbf{Encapsulation}} & \texttt{self.\_\_marks} is \textbf{private}; accessed only via \texttt{get\_marks()}. \\
+				\hline
+				{\color{inheritance}\textbf{Inheritance}} & \texttt{Student(Person)} and \texttt{Teacher(Person)} inherit from \texttt{Person}. \\
+				\hline
+				{\color{polymorphism}\textbf{Polymorphism}} & \texttt{for p in people: p.display\_details()} behaves differently for each object. \\
+				\hline
+			\end{tabular}
+		\end{center}
+		
+		\vspace{0.1cm}
+		
+		\noindent \textbf{References:}
+		\vspace{0.05cm}
+		
+		\begin{thebibliography}{9}
+			\bibitem{kaur2026} 
+			Kaur, S. (2026). \textit{Mastering Object-Oriented Programming with Python}. Unpublished Textbook. Makerere University.
+			
+			\bibitem{python} 
+			Python Software Foundation. (2026). \textit{Python 3 Documentation}. 
+			Retrieved from https://docs.python.org/3/
+		\end{thebibliography}
+		
+	\end{frame}
+	
+\end{document}

@@ -1,0 +1,524 @@
+================================================================================
+PROCESS LOG
+TOPIC: GRAPH NEURAL NETWORKS FOR ANOMALY DETECTION IN UNLABELED DATA:
+A PROOF OF CONCEPT STUDY USING UGANDA'S ELECTRONIC FISCAL RECEIPTING AND
+INVOICING SYSTEM DATA
+================================================================================
+
+Execution Date : 2026-07-02 21:36:34
+Updated        : 2026-11-06 (pipeline revision 2 / hypothesis tests revision 3)
+R Version      : R version 4.6.1 (2026-06-24 ucrt)
+Python Version : 3.13.15 (torch 2.10.0+cpu, PyTorch Geometric 2.8.0, scipy 1.16.3)
+Platform       : Windows 10 x64 (all GNN training on CPU)
+Seeds          : R and Isolation Forest: 7142
+                 GNN training: 7142, 2718, 3141 (seed-averaged scores)
+                 Injection benchmark: injection seeds 101, 202 x GNN seeds above
+
+================================================================================
+WHY THE NUMBERS CHANGED (READ FIRST)
+================================================================================
+
+Three problems in the July-September pipeline were found and fixed. Any
+number quoted from the previous version of this log is superseded.
+
+1. SALES EXTRACT WAS TRUNCATED. The July extract stopped at 1,048,575 rows
+   (the Excel row limit). The extract was rebuilt from the source in 19
+   chunks (18 x 950,000 + 411,132 = 17,511,132 rows, no overlaps). The old
+   "decline after 2018" and "17 of 28 zero-sales refund cases" findings were
+   largely artefacts of the truncation and no longer stand.
+
+2. CRITICAL GNN BUG FIXED (gnn_pipeline_actual.py). The rev-1 pipeline
+   percentile-clipped node features over the FULL matrix (165,094 nodes,
+   of which only 614 are taxpayers), which zeroed every node feature; the
+   GNNs were effectively trained on nothing. Scores were degenerate (all
+   614 taxpayer scores within 5.7e-6). Fixed: scaling fitted on taxpayer
+   rows only; 3 structural features (log in/out-degree, PageRank) added
+   for ALL nodes; reciprocal edges removed from the training graph;
+   models scored by reconstruction error on HELD-OUT edges (15% mask);
+   early stopping added; 3 seeds trained and averaged.
+
+3. HYPOTHESIS TESTS REDESIGNED (rev 3, after supervisor feedback).
+   - H1  previously mixed two claims (community structure AND power-law
+         fit) in one decision rule. Community structure is now the only
+         decision criterion; the degree distribution is descriptive.
+   - H2  previously tested IF-flagged vs non-flagged taxpayers on the very
+         features IF was trained on - circular by construction. The
+         decision now rests on graph features IF never saw.
+   - H4a now decided by top-k overlap (full-range Spearman ranks noise in
+         the near-zero score mass); Spearman kept as secondary.
+   - H4b permutation test added (the binomial assumed independent flag
+         sets without checking).
+
+================================================================================
+OBJECTIVE 1: DATA STRUCTURE ANALYSIS
+================================================================================
+
+RAW DATA LOADED:
+  Sales invoices      : 17,511,132 rows (2018-2022, full extract, 19 chunks)
+  Purchase invoices   : 5,049,092 rows (2018-2022)
+  Node ID mappings    : 165,094 nodes (1 node ID per TIN, shared across files)
+
+SALES INVOICES (2018-2022, full extract):
+  Total value         : 216.5 trillion UGX
+  Total VAT           : 35.4 trillion UGX
+  Seller-buyer pairs  : 400,568
+  By year (invoices)  : 2018: 3,303,100 | 2019: 3,825,097 | 2020: 3,415,874
+                        2021: 4,081,647 | 2022: 2,885,414
+  Note                : Nov-2022 return period nearly empty (right-censoring,
+                        extract cut-off), not a real decline. 849 rows (0.005%)
+                        have mistyped years (e.g. "0218") - documented, excluded
+                        from temporal counts.
+
+PURCHASE INVOICES (2018-2022):
+  Total value         : 97.8 trillion UGX
+  Total input VAT     : 17.0 trillion UGX
+  Buyer-supplier pairs: 70,599
+
+DATA QUALITY (documented decisions):
+  Non-positive amounts: sales 997,426 (5.7%) - credit notes/reversals, kept
+  Duplicate rows      : sales 6,437,052 (36.8%) - KEPT. The system assigns a
+                        unique ID per transaction; identical-looking rows are
+                        distinct transactions. This decision applies everywhere.
+  Self-loops          : sales 198,988 rows (1.14% of rows, 6.47% of value, 90%
+                        at exactly 18% VAT) - KEPT. Ugandan VAT law allows
+                        self-invoicing in defined cases. Not treated as anomalies.
+  Large taxpayers     : 601 of 614 appear as sellers in sales; all 614 appear
+                        as buyers in purchases; 13 taxpayers have no sales rows.
+
+NETWORK (directed, both directions):
+  Nodes               : 165,094 (614 taxpayers + 164,480 counterparties)
+  Edges               : 471,167 (400,568 sells_to + 70,599 buys_from)
+  Note                : the sales and purchases extracts describe the same
+                        invoices from two sides; the two edge types overlap.
+
+================================================================================
+OBJECTIVE 2: ISOLATION FOREST BASELINE
+================================================================================
+
+MODEL SPECIFICATION (unchanged from July; rev-1 review items M1/M2/M4 are
+documented limitations, not silent fixes):
+  Algorithm    : Extended Isolation Forest (isotree R package)
+  Grid search  : 18 configurations - ntrees {100,300,500} x
+                 sample_size {64,128,256} x ndim {1,2}
+  Seed         : 7142 (all configurations)
+  Convergence  : ~200 trees (Spearman > 0.99 vs 500-tree model)
+
+RESULTS:
+  Anomalies flagged     : 62 (top 10% of 614 taxpayers)
+  Score range           : [0.326, 0.763], mean 0.397, sd 0.071
+  Top feature drivers   (z-profile, anomalous vs normal):
+    1. var_purchase_value      - purchase amount volatility
+    2. var_sale_value          - sales amount volatility
+    3. output_input_vat_ratio  - VAT claim imbalance
+    4. purchase_to_sales_ratio - disproportionate purchases
+  Formal test           : H2 rev 3 (see FORMAL HYPOTHESIS TESTING) - the old
+                          same-feature test was circular and is now descriptive.
+
+================================================================================
+OBJECTIVE 3: GRAPH NEURAL NETWORKS (rev 2)
+================================================================================
+
+PIPELINE: gnn_pipeline_actual.py (PyTorch Geometric, CPU)
+  Seeds         : 7142, 2718, 3141; scores averaged over seeds
+  Training      : self-supervised link reconstruction, 15% edge mask
+                  (~389,900 train / 70,675 held-out edges per seed)
+  Graph         : 165,094 nodes | 471,167 edges
+  Node features : 13 per node - 10 financial (taxpayers only; counterparties
+                  carry structural features only) + log in/out-degree + PageRank
+  Fix applied   : feature scaling fitted on the 614 taxpayer rows only (rev 1
+                  zeroed all features - see WHY THE NUMBERS CHANGED)
+  Scoring       : reconstruction error on HELD-OUT edges per taxpayer node
+                  (75.2% of nodes have no held-out edge and fall back to the
+                  training-edge error - reported, a limitation)
+  Early stopping: patience 20 epochs, max 150
+
+RGCN (2-layer, 64 hidden -> 32 output, basis decomp. B=2, 2 relations):
+  Early stop    : epoch 123 / 150 / 134 across the three seeds
+  Train time    : ~156-183 s per seed
+
+GAT (2-layer, multi-head attention):
+  Early stop    : epoch 68 / 150 / 80 across the three seeds
+  Train time    : ~233-502 s per seed
+
+SEED STABILITY (Spearman of scores between seed pairs, taxpayers):
+  RGCN  : 0.40 - 0.53 (moderate)
+  GAT   : 0.02 - 0.46 (weak; seed choice matters for GAT rankings)
+
+SCORES vs DEGREE (supervisor check: are GNN scores just degree?):
+  Taxpayer scope: RGCN Spearman -0.38 to -0.39 with log degrees (some degree
+  dependence); GAT -0.05 to +0.10 (no degree dependence); IF -0.04 to -0.17.
+  GNN scores are not purely degree, but RGCN carries a degree component.
+
+GAT EMBEDDING CLUSTERING (k-means on 614 taxpayers, silhouette sweep):
+  k=3: 0.668 | k=5: 0.530 | k=7: 0.497 | k=10: 0.455
+  Best k = 3. Clusters are structural roles (connectivity levels), not
+  interpretable as fraud subtypes.
+
+SCORE DISTRIBUTIONS (taxpayers, seed-averaged):
+  IF   : mean 0.3973 | sd 0.0708 | range [0.326, 0.763]
+  RGCN : mean 0.0078 | sd 0.0274 | range [0.000, 0.489]
+  GAT  : mean 0.0025 | sd 0.0181 | range [0.000, 0.327]
+
+================================================================================
+MODEL COMPARISON (all on the 614 taxpayers, top 10% = 62 per model)
+================================================================================
+
+FLAG SETS (top 10% per model):
+  IF-flagged           : 62
+  RGCN-flagged         : 62
+  GAT-flagged          : 62
+  Consensus (>= 2)     : 35
+  All three            : 6
+
+PAIRWISE OVERLAPS vs INDEPENDENCE (expected 6.26 per pair):
+  IF & RGCN  : 13  (p = 0.0053)
+  IF & GAT   :  8  (p = 0.2797)
+  RGCN & GAT : 26  (p < 0.0001)
+  All three  :  6  (expected 0.63, p < 0.0001)
+
+EXCLUSIVE GROUPS:
+  IF-unique        : 47
+  GNN-unique       : 63
+  Consensus        : 35
+  Non-flagged      : 469
+
+Honest reading: the two GNNs agree strongly with each other and only weakly
+with IF. The all-three overlap (6 vs 0.63 expected) is real but small.
+
+================================================================================
+IF + HAND-BUILT GRAPH FEATURES BASELINE (real-data analog of injection
+detector D3; script 06_if_graph_baseline.R, seed 7142)
+================================================================================
+
+Question: do GNN embeddings find anything beyond simple graph statistics?
+Two Isolation Forests (isotree, ntrees 200, sample_size 256):
+  IF-fin         : 5 financial features (as script 01)
+  IF-fin+graph   : 5 financial + 7 graph features (log in/out-degree,
+                   log in/out-weight, PageRank, reciprocated value share,
+                   largest-counterparty share)
+
+RESULTS:
+  Consensus cases (35) recovered     : IF-fin 12  ->  IF-fin+graph 18
+  GNN-flagged (98) recovered         : IF-fin 16  ->  IF-fin+graph 25
+  Permutation p (10,000 draws)       : 0.0001 for both comparisons
+
+Reading: graph features help (12 -> 18 consensus, 16 -> 25 GNN flags), and
+the overlap is far above chance. But 73 of 98 GNN-flagged taxpayers are not
+recovered by either IF variant, so the learned embeddings still flag cases
+that hand-built features miss. The GNNs earn part - not all - of their keep.
+
+================================================================================
+RULE BASELINE (zero sales, high purchases; supervisor-requested)
+================================================================================
+
+Definition: total_sales == 0 & total_purchases > 0 (13 taxpayers qualify).
+  Flagged by any model    : 5 of 13 (4 GAT-only + 1 all-three)
+  Flagged by all three    : 1 of 13 (node 1554 - also the strongest consensus case)
+  IF/RGCN flag none of the other 12.
+Reading: the simple audit rule and the models surface different cases; the
+rule alone would miss the pattern the GNNs agree on, and vice versa.
+
+================================================================================
+SYNTHETIC INJECTION BENCHMARK (BOND-style; script 05_injection_benchmark.py)
+================================================================================
+
+Design: inject synthetic patterns as NEW nodes with features computed from
+injected edges (tabularly ordinary: balanced sales/purchases, exact 18% VAT):
+  ring            : 10-node cyclic trading chain
+  shell_pair      : 5 reciprocal pairs
+  missing_trader  : 10 buyers with no sales
+Universe: 614 real taxpayers + injected nodes. Protocol: 2 injection seeds
+x 3 GNN seeds = 36 GNN trainings (tabular detectors run once per injection
+seed, count = 2). Metrics: recall@k (k = number of injected nodes).
+
+RECALL@K (mean +/- sd across runs):
+
+  Detector                       missing_trader   ring         shell_pair
+  -----------------------------------------------------------------------
+  D1 rule (tau at q50/q90/1B)    0.00             0.00         0.00
+  D2 IF-financial                0.55 (0.07)      0.20 (0.00)  0.05 (0.07)
+  D3 IF-fin+graph-feats          0.45 (0.07)      0.30 (0.00)  0.20 (0.00)
+  D4 SCC cycle baseline          0.00             0.00         0.00
+  D5 IF + RGCN embedding         0.48 (0.17)      0.70 (0.16)  0.67 (0.22)
+  D6 IF + GAT embedding          0.68 (0.18)      0.98 (0.04)  0.97 (0.08)
+  D7 RGCN link error (raw)       0.02 (0.04)      0.25 (0.19)  0.18 (0.18)
+  D7 GAT link error (raw)        0.00 (0.00)      0.67 (0.52)  0.80 (0.31)
+
+HONEST READING (report this, including the caveats):
+  - IF + GAT embeddings detect the structural patterns almost perfectly
+    (0.98 / 0.97) while the tabular-only IF (D2) nearly misses them
+    (0.20 / 0.05). This is the study's strongest pro-GNN evidence.
+  - The rule baseline's 0.00 is a THRESHOLD ARTIFACT: tau set from the real
+    large taxpayers' purchase scale is far above the injected nodes' scale.
+    Do not present it as "the rule fails"; report the tau sensitivity.
+  - The SCC cycle baseline finds nothing because the REAL large taxpayers
+    already form one giant strongly-connected core - rings rank at the
+    bottom, not in a small cycle. This is a real insight about the data.
+  - Raw GNN link-error scores (D7) are unstable across seeds (sd up to 0.52).
+    Value comes from embeddings fed to IF, not from raw GNN scores.
+  - Tabular detectors were evaluated once per injection seed (count = 2)
+    vs GNN detectors (count = 6); their sd is less precisely estimated.
+
+================================================================================
+TEMPORAL / ROBUSTNESS / POLICY (updated to 35 consensus cases)
+================================================================================
+
+TEMPORAL VALIDATION:
+  Burst activity (1-2 years active) : 10 of 35 (29%)
+  Sustained activity (3+ years)     : 25 of 35 (71%)
+  Note: "burst" = active in at most 2 purchase-years. Report the base rate
+  interpretation carefully; most consensus cases are established traders,
+  BASE RATE (computed 2026-11-06): across all 614 taxpayers, 69 (11.2%)
+  are active in at most 2 purchase-years, vs 10 of 35 (28.6%) of
+  consensus cases - burst activity is ~2.6x the base rate. Median
+  active years: 5 overall vs 4 for consensus cases.
+  not new market entrants. (The July claim of 71% BURST was an artefact of
+  the truncated extract and is reversed.)
+
+ROBUSTNESS TO IF CONTAMINATION PARAMETER:
+  Contamination    Retained      Percentage
+  -------------------------------------------
+  5%               9 of 35       25.7%
+  10%              15 of 35      42.9%
+  15%              16 of 35      45.7%
+  At the strict 5% threshold less than a third of consensus cases persist;
+  say so plainly rather than calling the result "robust".
+
+POLICY IMPACT (indicative only - the 5/25/50% multipliers are assumptions,
+not estimates; keep them clearly labelled as scenarios):
+  Consensus cases identified         : 35
+  Purchase-only entities             : 2 (was 17 under the truncated extract)
+  Total input VAT claimed (PO only)  : 3,019.8B UGX
+  Revenue at risk:
+    Scenario A  (5% of input VAT)    : 151.0B UGX
+    Scenario B (25% of input VAT)    : 754.9B UGX
+    Scenario C (50% of input VAT)    : 1,509.9B UGX
+
+================================================================================
+FORMAL HYPOTHESIS TESTING (rev 3; script 04_hypothesis_tests.R, seed 7142)
+================================================================================
+
+H1: NETWORK TOPOLOGY - REJECT
+  Graph (simplified, undirected): 165,094 nodes, 445,730 edges.
+  Observed Louvain modularity: 0.4874.
+  Null (1,000 configuration-model graphs, same degree sequence):
+  mean = 0.3676, SD = 0.0003. z = 438.3; empirical p = 0.0010.
+  Decision rule (rev 3): reject if p < 0.05. REJECTED - community structure
+  is far above degree-matched chance.
+  H1b (descriptive, not a decision): degree tail heavy (alpha = 2.21,
+  xmin = 5); bootstrap KS rejects a pure power law (p = 0.0000), so describe
+  it as heavy-tailed, not power-law.
+
+H2: BASELINE DETECTION (rev 3, non-circular) - REJECT
+  Rev-1 test (IF flags vs IF's own training features) was circular and is
+  retained as a descriptive profile only. Decision now on 5 graph features
+  IF never saw (Mann-Whitney U, BH-corrected):
+    log_out_degree          : flagged LOWER  (4.51 vs 5.46), p_adj = 0.0029
+    reciprocated_share      : flagged HIGHER (0.589 vs 0.356), p_adj = 0.0004
+    max_counterparty_share  : flagged HIGHER (0.375 vs 0.253), p_adj = 0.0004
+    log_in_degree, page_rank: not significant
+  3 of 5 held-out features significant (min adj. p = 0.0004). REJECTED.
+  Reading: IF-flagged taxpayers are concentrated, heavily reciprocal
+  traders with fewer distinct connections - a coherent held-out signature,
+  not a tautology.
+
+H3: GRAPH-MODEL DETECTION - FAIL TO REJECT
+  Flag groups differ structurally (smallest Kruskal-Wallis p < 0.0001), BUT
+  GNN-unique flags (63) do NOT exceed the independence expectation (100.2).
+  The supervisor's "wrong way" concern stands: being flagged by only one
+  GNN is, if anything, less common than chance would predict.
+
+H4a: SCORE INDEPENDENCE (rev 3) - REJECT (for one pair only)
+  Primary: top-62 overlap vs permutation null (10,000 permutations):
+    IF & RGCN  : 13 (expected 6.26), p = 0.0065
+    IF & GAT   :  8 (expected 6.26), p = 0.2756
+    RGCN & GAT : 26 (expected 6.26), p = 0.0001
+  Secondary (full-range Spearman, ranks noise - do not lead with it):
+    IF-RGCN -0.105 [-0.182, -0.026]; IF-GAT +0.038 [-0.041, +0.117];
+    RGCN-GAT +0.233 [+0.157, +0.307].
+  Reading: IF is independent of both GNNs; the two GNNs share real signal
+  with each other at the top of their rankings.
+
+H4b: CONSENSUS PRECISION (rev 3) - REJECT
+  Observed consensus (>= 2 flags): 35. Expected under independence: 17.52.
+  Binomial p = 0.0001. Permutation test (10,000 permutations of all three
+  score vectors): permuted mean 17.52 (SD 3.38), p < 0.0001. Total pairwise
+  overlaps 47 vs 18.78 expected (Poisson p < 0.0001).
+  Reading: model agreement at the top of the rankings is non-random, and
+  the permutation test confirms it does not depend on the binomial's
+  independence assumption.
+
+SUMMARY TABLE:
+  H1   reject          - community structure above degree-matched chance
+  H2   reject          - IF flags track held-out graph anomalies (non-circular)
+  H3   fail to reject  - GNN-unique flags do not exceed chance
+  H4a  reject (partial)- RGCN & GAT share top-ranked signal; IF does not
+  H4b  reject          - consensus exceeds independence (permutation-confirmed)
+
+================================================================================
+BLINDED AUDITOR REVIEW SET (45 CASES)
+================================================================================
+
+WHY 45 CASES: the supervisor asked for 'a small blind review of flagged versus
+random cases by URA auditors'. A review of flagged cases only cannot show
+anything - reviewers asked to confirm suspects will confirm them. Mixing in
+non-flagged controls turns the exercise into a discrimination test: if the
+models' flags carry real information, auditors should rate consensus cases as
+more suspicious than the controls; if the ratings come out the same, the flags
+add nothing over chance.
+
+COMPOSITION:
+  - 35 CONSENSUS cases: every taxpayer flagged by 2 or more of the three
+    models (top 10% per model). This is the pipeline's full actionable output,
+    so the review mirrors how the tool would actually be used.
+  - 10 CONTROL cases: non-flagged taxpayers matched on what an auditor sees
+    first - total sales and total purchases. Each control sits within 1.5 SD
+    of the consensus group's medians in (log sales, log purchases) space and
+    the 10 closest were taken (seed 9413). Without size matching, reviewers
+    could 'detect' flagged firms simply because they are bigger.
+  - SHUFFLED: the review file holds case_num, node_id and the four visible
+    metrics in random order; the consensus/control labels stay in the two
+    case-card files, so the reviewer cannot tell which is which.
+  - TASK: auditors rate each case 1-10 on suspicion; the analysis then
+    compares consensus vs control ratings.
+
+CAVEATS (state these in the write-up):
+  - Controls are matched on financial size only, not on graph position -
+    deliberate, because the question is whether the GNN flags add signal
+    beyond what a size-similar firm looks like on paper.
+  - 10 controls give only a coarse comparison; this fits the
+    feasibility-study framing.
+
+THE 45 CASES (case_num matches the blinded review file):
+  case       node_id            sales UGX   purchases UGX   partners  type
+  ----  -------------  ---------------  ---------------  --------  ---------
+     1          600         42,534,429     23,253,297,933        46  CONSENSUS
+     2          548        220,811,441      7,164,209,990        13  CONSENSUS
+     3          545    103,623,514,156         12,711,864         9  CONSENSUS
+     4          339     52,341,390,937         96,018,229         3  CONSENSUS
+     5           89    377,394,017,355     28,501,646,149        33  CONSENSUS
+     6         1554                  0        482,920,960         1  CONSENSUS
+     7          583        493,798,015      1,276,025,519         8  CONSENSUS
+     8          508      7,659,300,170        152,934,009        16  CONSENSUS
+     9          161     41,074,979,966     29,063,502,789         9  CONSENSUS
+    10            9  6,077,077,229,306  6,432,764,243,666       205  CONSENSUS
+    11          422     32,244,799,962      4,953,925,264         7  CONSENSUS
+    12          482      3,088,039,319    135,688,143,629        29  CONSENSUS
+    13          262     17,054,123,315        159,429,187        24  CONSENSUS
+    14          464     34,467,839,582      3,562,443,090         4  CONSENSUS
+    15          532        294,562,883      3,232,809,246        20  CONSENSUS
+    16          553     45,230,031,877         92,667,233        38  CONSENSUS
+    17          200     16,080,797,790      1,683,706,991        28  CONSENSUS
+    18          343        951,288,138      3,990,547,539        31  CONSENSUS
+    19          358     17,334,738,604      1,096,297,113        62  CONSENSUS
+    20          379     13,809,177,762        954,364,540         5  CONSENSUS
+    21          496     71,557,872,192     91,399,092,717        28  CONSENSUS
+    22          554    248,530,155,320     15,346,117,001        54  CONSENSUS
+    23          396     19,909,765,915     36,911,145,802      1035  CONSENSUS
+    24           77     13,853,450,088      2,923,753,275       144  CONSENSUS
+    25          413      1,108,665,230        777,008,761       254  CONSENSUS
+    26          582         77,000,038     30,375,434,895       191  CONSENSUS
+    27          283    611,347,650,404        727,655,050        48  CONSENSUS
+    28          421     15,574,237,719     15,593,396,706       115  CONSENSUS
+    29          547     72,466,413,171         10,085,658         2  CONSENSUS
+    30          561                  0          1,297,961         2  CONSENSUS
+    31          432      4,090,971,669      2,241,281,946        68  CONSENSUS
+    32          191     39,526,421,026         28,995,829        18  CONSENSUS
+    33          458     28,067,206,133     16,306,450,207       106  CONSENSUS
+    34          589    158,933,868,323     43,496,059,946        40  CONSENSUS
+    35          151     26,123,506,044      6,060,452,498       139  CONSENSUS
+    36          364     15,612,140,923      2,974,671,067        16  CONTROL
+    37          217     13,620,208,225      3,347,299,653     36043  CONTROL
+    38           16     11,808,990,407      3,439,339,335        98  CONTROL
+    39          138     16,928,617,075      4,077,517,948        79  CONTROL
+    40          375     13,891,359,792      2,614,959,921       166  CONTROL
+    41          592     10,471,725,603      3,392,842,023        42  CONTROL
+    42           69     26,173,073,130      2,760,337,904       111  CONTROL
+    43          394     23,958,179,165      4,344,754,262       347  CONTROL
+    44          304     31,844,347,275      2,815,629,136      1144  CONTROL
+    45          567     23,681,046,465      4,388,513,185        17  CONTROL
+
+EGO NETWORK PLOTS FOR THE REVIEW (regenerated 2026-11-06):
+  All 45 cases now have an elaborate ego-network plot in data/ego_networks/
+  (ego_<case>_<node>.png): directed arrowheads, blue = sells_to, orange =
+  buys_from, edge width = transaction value, focal node highlighted, node
+  labels, top 30 partners shown for hub firms (ranked by value). Subtitles
+  exclude model flags so the review stays blind. 89 stale ego plots from the
+  earlier case numbering were moved to ego_networks/_stale/.
+  The report showcase figure is data/Plots/ego_04_node_339.png (node 339, a
+  triple-flagged consensus case; renamed from ego_01_node_339.png because the
+  case numbering changed - update the report reference accordingly).
+
+  Note on partner counts: the case cards' n_unique_partners counts partners in
+  the taxpayer's OWN records (for node 339: 1 sales customer + 2 suppliers =
+  3), while the plotted network also shows relationships recorded by the other
+  side (7 other taxpayers report sales TO node 339, plus node 9's own purchase
+  record). Side-vs-side amounts can also disagree: node 339's sales record to
+  node 9 totals 52.3B UGX while node 9's purchase record from node 339 totals
+  62.9B UGX - a 10.6B cross-record mismatch worth flagging as a data-quality
+  finding in its own right.
+================================================================================
+OUTPUT FILES (all in data/)
+================================================================================
+
+  Scripts:
+    01_preprocessing_features_isolation_forest.R  (R pipeline, seed 7142)
+    02_phase4_analysis.R                          (case cards, auditor template)
+    03_remaining_analysis.R                       (temporal, robustness, policy)
+    04_hypothesis_tests.R                         (rev 3: H1-H4b, seed 7142)
+    05_injection_benchmark.py                     (BOND-style injection, 36 runs)
+    06_if_graph_baseline.R                        (IF + graph features, real data)
+    07_regenerate_plots.R                         (13 report figures, rev-3 data)
+    08_ego_networks_review.R                      (45 blinded ego networks)
+    gnn_pipeline_actual.py                        (Python GNNs rev 2, 3 seeds)
+    gnn_pipeline_actual_pre_review_backup.py      (rev-1 backup, for the audit trail)
+
+  Data outputs:
+    all_model_scores_actual.csv       - IF / RGCN / GAT scores, 614 taxpayers
+    case_cards_consensus_flagged.csv  - 35 consensus cases, full metrics
+    case_cards_control_matched.csv    - 10 matched controls
+    auditor_review_blinded.csv        - 45 cases shuffled, no model labels
+    if_convergence_actual.csv         - IF score stability vs tree count
+    ego_networks/                     - 45 blinded ego plots (+ _stale/ archive)
+    Plots/                            - 13 regenerated report figures (cairo png)
+    rule_baseline_zero_sales.csv      - 13 zero-sales taxpayers + model flags
+    if_graph_baseline_flags.csv       - IF-fin and IF-fin+graph scores/flags
+    injection_benchmark_results.csv   - per-run recall/precision/AP
+    injection_benchmark_summary.csv   - detector x pattern summary
+    injection/ground_truth.csv        - injected node ground truth
+    seed_stability.csv                - score Spearman across GNN seeds
+    score_degree_correlation.csv      - GNN scores vs degree (supervisor check)
+    temporal_analysis.csv             - burst/sustained classification
+    robustness_contamination.csv      - IF contamination sensitivity
+    policy_revenue_at_risk.csv        - revenue-at-risk scenarios
+    hypothesis_tests/                 - H1-H4b outputs (CSV + TXT per test),
+                                        hypothesis_summary_table.csv,
+                                        hypothesis_report.md
+
+================================================================================
+EXECUTION SUMMARY
+================================================================================
+
+  Script 1 (full pipeline)   : ~74 seconds
+  Script 2 (phase 4)         : 0.2 seconds
+  Script 3 (remaining)       : 1.1 seconds
+  Script 4 (hypotheses rev3) : ~1 hour (1,000 null graphs + power-law bootstrap)
+  GNN pipeline rev 2         : ~25 minutes CPU (3 seeds x 2 models)
+  Injection benchmark rev 2  : ~overnight (36 GNN trainings)
+  Plot regeneration (Nov 6)  : ~2 minutes (13 figures, cairo png device)
+  Ego networks (Nov 6)       : ~1 minute (45 blinded cases, no flags shown)
+
+  DATA        : sales truncation fixed | 17,511,132 rows | 165,094 nodes
+  IF BASELINE : 62 flagged (unchanged) | validated on held-out graph features (H2)
+  GNNs rev 2  : critical feature-scaling bug fixed | 3 seeds | held-out scoring
+  COMPARISON  : 35 consensus | 6 all-three | GNNs agree with each other, not IF
+  BENCHMARK   : IF+GAT 0.98 ring / 0.97 shell vs 0.20 / 0.05 for tabular IF
+  HYPOTHESES  : H1, H2, H4a (partial), H4b rejected | H3 not rejected
+  FIGURES     : all 13 report figures + 45 blinded ego networks regenerated
+
+  Reproducibility: R + IF with seed 7142; GNNs with seeds 7142, 2718, 3141
+  (seed-averaged). Rerunning the scripts reproduces all numbers.
+
+================================================================================
+END OF PROCESS LOG
+================================================================================

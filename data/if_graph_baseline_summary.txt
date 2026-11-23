@@ -1,0 +1,15 @@
+IF + hand-built graph features (real-data analog of injection detector D3)
+============================================================
+Taxpayers: 614. Flagged top 10%: n = 62 per detector.
+IF settings: isotree, ntrees = 200, sample_size = 256, seed 7142.
+Graph features: log in/out-degree, log in/out-weight, PageRank,
+reciprocated value share, largest-counterparty share.
+
+Consensus cases (GNN pipeline, n = 35): recovered by IF-fin = 12; by IF-fin+graph = 18.
+GNN-flagged (RGCN or GAT, n = 98): recovered by IF-fin = 16; by IF-fin+graph = 25.
+Permutation p (IF-fin+graph overlap vs GNN-flagged): 0.0001.
+Permutation p (IF-fin+graph overlap vs consensus):   0.0001.
+
+Reading: if IF-fin+graph recovers most GNN-flagged cases, the GNN embeddings add
+little beyond simple graph statistics on the real data; a large gap supports the
+claim that learned embeddings capture structure the hand-built features miss.

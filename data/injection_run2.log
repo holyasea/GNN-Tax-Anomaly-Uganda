@@ -1,0 +1,366 @@
+============================================================
+Injection benchmark rev.2 (3 patterns x 2 inj seeds x 3 GNN seeds)
+============================================================
+
+── Scenario ring_s101 ──
+Graph: 165104 nodes, 471177 edges
+  Taxpayer nodes (financial features): 624
+  Counterparty-only nodes: 164480
+  Node features: 13 (10 financial + 3 structural)
+  split: 389846 train / 70676 held-out edges (10655 dropped as reciprocal-of-held-out)
+  RGCN Epoch 25/150 | loss 0.0539 | val 0.0345
+  RGCN Epoch 50/150 | loss 0.0180 | val 0.0137
+  RGCN Epoch 75/150 | loss 0.0150 | val 0.0104
+  RGCN Epoch 100/150 | loss 0.0138 | val 0.0095
+  RGCN Epoch 125/150 | loss 0.0104 | val 0.0096
+  RGCN early stop at epoch 150 (best val loss 0.0088)
+  RGCN seed 7142: train 235.9s | fallback nodes: 124199 (75.2%)
+  split: 389846 train / 70676 held-out edges (10655 dropped as reciprocal-of-held-out)
+  GAT Epoch 25/150 | loss 0.5730 | val 1.8437
+  GAT Epoch 50/150 | loss 0.3225 | val 1.6292
+  GAT early stop at epoch 57 (best val loss 0.4171)
+  GAT seed 7142: train 319.9s | fallback nodes: 124199 (75.2%)
+  split: 390020 train / 70676 held-out edges (10481 dropped as reciprocal-of-held-out)
+  RGCN Epoch 25/150 | loss 0.0395 | val 0.0280
+  RGCN Epoch 50/150 | loss 0.0190 | val 0.0147
+  RGCN Epoch 75/150 | loss 0.0150 | val 0.0118
+  RGCN Epoch 100/150 | loss 0.0123 | val 0.0102
+  RGCN Epoch 125/150 | loss 0.0096 | val 0.0103
+  RGCN early stop at epoch 140 (best val loss 0.0094)
+  RGCN seed 2718: train 187.1s | fallback nodes: 123993 (75.1%)
+  split: 390020 train / 70676 held-out edges (10481 dropped as reciprocal-of-held-out)
+  GAT Epoch 25/150 | loss 0.2801 | val 0.1721
+  GAT Epoch 50/150 | loss 0.0982 | val 0.0579
+  GAT Epoch 75/150 | loss 0.0482 | val 0.0227
+  GAT Epoch 100/150 | loss 0.0293 | val 0.0210
+  GAT early stop at epoch 115 (best val loss 0.0201)
+  GAT seed 2718: train 349.0s | fallback nodes: 123993 (75.1%)
+  split: 389797 train / 70676 held-out edges (10704 dropped as reciprocal-of-held-out)
+  RGCN Epoch 25/150 | loss 0.0372 | val 0.0305
+  RGCN Epoch 50/150 | loss 0.0169 | val 0.0146
+  RGCN early stop at epoch 70 (best val loss 0.0146)
+  RGCN seed 3141: train 84.7s | fallback nodes: 124118 (75.2%)
+  split: 389797 train / 70676 held-out edges (10704 dropped as reciprocal-of-held-out)
+  GAT Epoch 25/150 | loss 0.2592 | val 0.1416
+  GAT Epoch 50/150 | loss 0.0928 | val 0.0596
+  GAT Epoch 75/150 | loss 0.0330 | val 0.0316
+  GAT Epoch 100/150 | loss 0.0272 | val 0.0211
+  GAT Epoch 125/150 | loss 0.0248 | val 0.0221
+  GAT early stop at epoch 134 (best val loss 0.0205)
+  GAT seed 3141: train 383.2s | fallback nodes: 124118 (75.2%)
+detector
+D1_D1_rule_1B       0.000
+D1_D1_rule_q50      0.000
+D1_D1_rule_q90      0.000
+D2_if_fin           0.200
+D3_if_fin_graph     0.300
+D4_scc_cycle        0.000
+D5_if_rgcn          0.633
+D6_if_gat           0.967
+D7_gat_link_err     0.667
+D7_rgcn_link_err    0.267
+
+── Scenario ring_s202 ──
+Graph: 165104 nodes, 471177 edges
+  Taxpayer nodes (financial features): 624
+  Counterparty-only nodes: 164480
+  Node features: 13 (10 financial + 3 structural)
+  split: 389846 train / 70676 held-out edges (10655 dropped as reciprocal-of-held-out)
+  RGCN Epoch 25/150 | loss 0.0507 | val 0.0325
+  RGCN Epoch 50/150 | loss 0.0171 | val 0.0142
+  RGCN Epoch 75/150 | loss 0.0131 | val 0.0106
+  RGCN Epoch 100/150 | loss 0.0115 | val 0.0095
+  RGCN Epoch 125/150 | loss 0.0085 | val 0.0097
+  RGCN early stop at epoch 149 (best val loss 0.0089)
+  RGCN seed 7142: train 183.1s | fallback nodes: 124199 (75.2%)
+  split: 389846 train / 70676 held-out edges (10655 dropped as reciprocal-of-held-out)
+  GAT Epoch 25/150 | loss 0.5184 | val 1.4728
+  GAT Epoch 50/150 | loss 0.3419 | val 1.5435
+  GAT early stop at epoch 55 (best val loss 0.4290)
+  GAT seed 7142: train 157.3s | fallback nodes: 124199 (75.2%)
+  split: 390020 train / 70676 held-out edges (10481 dropped as reciprocal-of-held-out)
+  RGCN Epoch 25/150 | loss 0.0390 | val 0.0270
+  RGCN Epoch 50/150 | loss 0.0190 | val 0.0149
+  RGCN Epoch 75/150 | loss 0.0127 | val 0.0119
+  RGCN Epoch 100/150 | loss 0.0109 | val 0.0105
+  RGCN Epoch 125/150 | loss 0.0103 | val 0.0105
+  RGCN early stop at epoch 140 (best val loss 0.0096)
+  RGCN seed 2718: train 183.7s | fallback nodes: 123993 (75.1%)
+  split: 390020 train / 70676 held-out edges (10481 dropped as reciprocal-of-held-out)
+  GAT Epoch 25/150 | loss 0.2771 | val 0.1685
+  GAT Epoch 50/150 | loss 0.1022 | val 0.0609
+  GAT Epoch 75/150 | loss 0.0466 | val 0.0248
+  GAT Epoch 100/150 | loss 0.0266 | val 0.0231
+  GAT early stop at epoch 112 (best val loss 0.0222)
+  GAT seed 2718: train 316.1s | fallback nodes: 123993 (75.1%)
+  split: 389797 train / 70676 held-out edges (10704 dropped as reciprocal-of-held-out)
+  RGCN Epoch 25/150 | loss 0.0414 | val 0.0268
+  RGCN Epoch 50/150 | loss 0.0200 | val 0.0134
+  RGCN early stop at epoch 70 (best val loss 0.0134)
+  RGCN seed 3141: train 105.1s | fallback nodes: 124118 (75.2%)
+  split: 389797 train / 70676 held-out edges (10704 dropped as reciprocal-of-held-out)
+  GAT Epoch 25/150 | loss 0.2629 | val 0.1367
+  GAT Epoch 50/150 | loss 0.1080 | val 0.0652
+  GAT Epoch 75/150 | loss 0.0412 | val 0.0332
+  GAT Epoch 100/150 | loss 0.0278 | val 0.0208
+  GAT early stop at epoch 111 (best val loss 0.0202)
+  GAT seed 3141: train 398.1s | fallback nodes: 124118 (75.2%)
+detector
+D1_D1_rule_1B       0.000
+D1_D1_rule_q50      0.000
+D1_D1_rule_q90      0.000
+D2_if_fin           0.200
+D3_if_fin_graph     0.300
+D4_scc_cycle        0.000
+D5_if_rgcn          0.767
+D6_if_gat           1.000
+D7_gat_link_err     0.667
+D7_rgcn_link_err    0.233
+
+── Scenario shell_pair_s101 ──
+Graph: 165104 nodes, 471177 edges
+  Taxpayer nodes (financial features): 624
+  Counterparty-only nodes: 164480
+  Node features: 13 (10 financial + 3 structural)
+  split: 389846 train / 70676 held-out edges (10655 dropped as reciprocal-of-held-out)
+  RGCN Epoch 25/150 | loss 0.0521 | val 0.0348
+  RGCN Epoch 50/150 | loss 0.0179 | val 0.0137
+  RGCN Epoch 75/150 | loss 0.0119 | val 0.0100
+  RGCN Epoch 100/150 | loss 0.0105 | val 0.0090
+  RGCN Epoch 125/150 | loss 0.0095 | val 0.0087
+  RGCN early stop at epoch 150 (best val loss 0.0083)
+  RGCN seed 7142: train 227.2s | fallback nodes: 124199 (75.2%)
+  split: 389846 train / 70676 held-out edges (10655 dropped as reciprocal-of-held-out)
+  GAT Epoch 25/150 | loss 0.7128 | val 1.8231
+  GAT Epoch 50/150 | loss 0.3141 | val 2.0137
+  GAT early stop at epoch 57 (best val loss 0.6230)
+  GAT seed 7142: train 204.1s | fallback nodes: 124199 (75.2%)
+  split: 390020 train / 70676 held-out edges (10481 dropped as reciprocal-of-held-out)
+  RGCN Epoch 25/150 | loss 0.0398 | val 0.0291
+  RGCN Epoch 50/150 | loss 0.0213 | val 0.0188
+  RGCN Epoch 75/150 | loss 0.0140 | val 0.0142
+  RGCN Epoch 100/150 | loss 0.0126 | val 0.0122
+  RGCN Epoch 125/150 | loss 0.0121 | val 0.0110
+  RGCN Epoch 150/150 | loss 0.0106 | val 0.0105
+  RGCN seed 2718: train 1003.0s | fallback nodes: 123993 (75.1%)
+  split: 390020 train / 70676 held-out edges (10481 dropped as reciprocal-of-held-out)
+  GAT Epoch 25/150 | loss 0.2747 | val 0.1715
+  GAT Epoch 50/150 | loss 0.0883 | val 0.0492
+  GAT Epoch 75/150 | loss 0.0421 | val 0.0245
+  GAT early stop at epoch 88 (best val loss 0.0216)
+  GAT seed 2718: train 25932.3s | fallback nodes: 123993 (75.1%)
+  split: 389797 train / 70676 held-out edges (10704 dropped as reciprocal-of-held-out)
+  RGCN Epoch 25/150 | loss 0.0432 | val 0.0314
+  RGCN Epoch 50/150 | loss 0.0217 | val 0.0167
+  RGCN early stop at epoch 58 (best val loss 0.0159)
+  RGCN seed 3141: train 73.3s | fallback nodes: 124118 (75.2%)
+  split: 389797 train / 70676 held-out edges (10704 dropped as reciprocal-of-held-out)
+  GAT Epoch 25/150 | loss 0.2629 | val 0.1433
+  GAT Epoch 50/150 | loss 0.1210 | val 0.1122
+  GAT Epoch 75/150 | loss 0.0424 | val 0.0228
+  GAT Epoch 100/150 | loss 0.0318 | val 0.0238
+  GAT early stop at epoch 113 (best val loss 0.0203)
+  GAT seed 3141: train 371.5s | fallback nodes: 124118 (75.2%)
+detector
+D1_D1_rule_1B       0.000
+D1_D1_rule_q50      0.000
+D1_D1_rule_q90      0.000
+D2_if_fin           0.000
+D3_if_fin_graph     0.200
+D4_scc_cycle        0.000
+D5_if_rgcn          0.700
+D6_if_gat           1.000
+D7_gat_link_err     0.800
+D7_rgcn_link_err    0.233
+
+── Scenario shell_pair_s202 ──
+Graph: 165104 nodes, 471177 edges
+  Taxpayer nodes (financial features): 624
+  Counterparty-only nodes: 164480
+  Node features: 13 (10 financial + 3 structural)
+  split: 389846 train / 70676 held-out edges (10655 dropped as reciprocal-of-held-out)
+  RGCN Epoch 25/150 | loss 0.0525 | val 0.0326
+  RGCN Epoch 50/150 | loss 0.0183 | val 0.0124
+  RGCN Epoch 75/150 | loss 0.0144 | val 0.0096
+  RGCN Epoch 100/150 | loss 0.0115 | val 0.0084
+  RGCN Epoch 125/150 | loss 0.0113 | val 0.0086
+  RGCN early stop at epoch 150 (best val loss 0.0079)
+  RGCN seed 7142: train 227.0s | fallback nodes: 124199 (75.2%)
+  split: 389846 train / 70676 held-out edges (10655 dropped as reciprocal-of-held-out)
+  GAT Epoch 25/150 | loss 0.6940 | val 1.8257
+  GAT Epoch 50/150 | loss 0.3279 | val 1.5273
+  GAT early stop at epoch 57 (best val loss 0.5356)
+  GAT seed 7142: train 168.8s | fallback nodes: 124199 (75.2%)
+  split: 390020 train / 70676 held-out edges (10481 dropped as reciprocal-of-held-out)
+  RGCN Epoch 25/150 | loss 0.0410 | val 0.0294
+  RGCN Epoch 50/150 | loss 0.0192 | val 0.0165
+  RGCN Epoch 75/150 | loss 0.0130 | val 0.0135
+  RGCN Epoch 100/150 | loss 0.0114 | val 0.0123
+  RGCN Epoch 125/150 | loss 0.0114 | val 0.0112
+  RGCN Epoch 150/150 | loss 0.0101 | val 0.0110
+  RGCN seed 2718: train 431.2s | fallback nodes: 123993 (75.1%)
+  split: 390020 train / 70676 held-out edges (10481 dropped as reciprocal-of-held-out)
+  GAT Epoch 25/150 | loss 0.2629 | val 0.1709
+  GAT Epoch 50/150 | loss 0.0954 | val 0.0554
+  GAT Epoch 75/150 | loss 0.0449 | val 0.0240
+  GAT Epoch 100/150 | loss 0.0342 | val 0.0215
+  GAT early stop at epoch 105 (best val loss 0.0206)
+  GAT seed 2718: train 362.7s | fallback nodes: 123993 (75.1%)
+  split: 389797 train / 70676 held-out edges (10704 dropped as reciprocal-of-held-out)
+  RGCN Epoch 25/150 | loss 0.0369 | val 0.0346
+  RGCN Epoch 50/150 | loss 0.0145 | val 0.0156
+  RGCN early stop at epoch 70 (best val loss 0.0156)
+  RGCN seed 3141: train 2570.9s | fallback nodes: 124118 (75.2%)
+  split: 389797 train / 70676 held-out edges (10704 dropped as reciprocal-of-held-out)
+  GAT Epoch 25/150 | loss 0.2626 | val 0.1446
+  GAT Epoch 50/150 | loss 0.1100 | val 0.1087
+  GAT Epoch 75/150 | loss 0.0364 | val 0.0247
+  GAT Epoch 100/150 | loss 0.0257 | val 0.0226
+  GAT Epoch 125/150 | loss 0.0231 | val 0.0230
+  GAT early stop at epoch 137 (best val loss 0.0197)
+  GAT seed 3141: train 1391.1s | fallback nodes: 124118 (75.2%)
+detector
+D1_D1_rule_1B       0.000
+D1_D1_rule_q50      0.000
+D1_D1_rule_q90      0.000
+D2_if_fin           0.100
+D3_if_fin_graph     0.200
+D4_scc_cycle        0.000
+D5_if_rgcn          0.633
+D6_if_gat           0.933
+D7_gat_link_err     0.800
+D7_rgcn_link_err    0.133
+
+── Scenario missing_trader_s101 ──
+Graph: 165104 nodes, 471197 edges
+  Taxpayer nodes (financial features): 624
+  Counterparty-only nodes: 164480
+  Node features: 13 (10 financial + 3 structural)
+  split: 390035 train / 70679 held-out edges (10483 dropped as reciprocal-of-held-out)
+  RGCN Epoch 25/150 | loss 0.0343 | val 0.0205
+  RGCN Epoch 50/150 | loss 0.0171 | val 0.0127
+  RGCN Epoch 75/150 | loss 0.0120 | val 0.0112
+  RGCN Epoch 100/150 | loss 0.0115 | val 0.0091
+  RGCN early stop at epoch 101 (best val loss 0.0082)
+  RGCN seed 7142: train 145.3s | fallback nodes: 124115 (75.2%)
+  split: 390035 train / 70679 held-out edges (10483 dropped as reciprocal-of-held-out)
+  GAT Epoch 25/150 | loss 0.2662 | val 0.1847
+  GAT Epoch 50/150 | loss 0.0791 | val 0.0381
+  GAT Epoch 75/150 | loss 0.0312 | val 0.0276
+  GAT Epoch 100/150 | loss 0.0277 | val 0.0259
+  GAT early stop at epoch 104 (best val loss 0.0250)
+  GAT seed 7142: train 356.0s | fallback nodes: 124115 (75.2%)
+  split: 389952 train / 70679 held-out edges (10566 dropped as reciprocal-of-held-out)
+  RGCN Epoch 25/150 | loss 0.0435 | val 0.0296
+  RGCN Epoch 50/150 | loss 0.0204 | val 0.0177
+  RGCN Epoch 75/150 | loss 0.0137 | val 0.0124
+  RGCN Epoch 100/150 | loss 0.0120 | val 0.0121
+  RGCN early stop at epoch 123 (best val loss 0.0113)
+  RGCN seed 2718: train 170.0s | fallback nodes: 124086 (75.2%)
+  split: 389952 train / 70679 held-out edges (10566 dropped as reciprocal-of-held-out)
+  GAT Epoch 25/150 | loss 0.2263 | val 0.1201
+  GAT Epoch 50/150 | loss 0.0424 | val 0.0286
+  GAT Epoch 75/150 | loss 0.0349 | val 0.0260
+  GAT early stop at epoch 84 (best val loss 0.0238)
+  GAT seed 2718: train 274.7s | fallback nodes: 124086 (75.2%)
+  split: 389975 train / 70679 held-out edges (10543 dropped as reciprocal-of-held-out)
+  RGCN Epoch 25/150 | loss 0.0478 | val 0.0315
+  RGCN Epoch 50/150 | loss 0.0199 | val 0.0217
+  RGCN Epoch 75/150 | loss 0.0100 | val 0.0135
+  RGCN early stop at epoch 98 (best val loss 0.0132)
+  RGCN seed 3141: train 136.1s | fallback nodes: 124046 (75.1%)
+  split: 389975 train / 70679 held-out edges (10543 dropped as reciprocal-of-held-out)
+  GAT Epoch 25/150 | loss 0.4344 | val 1.9381
+  GAT Epoch 50/150 | loss 0.2231 | val 0.1559
+  GAT Epoch 75/150 | loss 0.2335 | val 0.0868
+  GAT Epoch 100/150 | loss 0.0939 | val 0.0315
+  GAT Epoch 125/150 | loss 0.0303 | val 0.0232
+  GAT Epoch 150/150 | loss 0.0279 | val 0.0225
+  GAT seed 3141: train 670.3s | fallback nodes: 124046 (75.1%)
+detector
+D1_D1_rule_1B       0.000
+D1_D1_rule_q50      0.000
+D1_D1_rule_q90      0.000
+D2_if_fin           0.600
+D3_if_fin_graph     0.500
+D4_scc_cycle        0.000
+D5_if_rgcn          0.533
+D6_if_gat           0.700
+D7_gat_link_err     0.000
+D7_rgcn_link_err    0.033
+
+── Scenario missing_trader_s202 ──
+Graph: 165104 nodes, 471197 edges
+  Taxpayer nodes (financial features): 624
+  Counterparty-only nodes: 164480
+  Node features: 13 (10 financial + 3 structural)
+  split: 390035 train / 70679 held-out edges (10483 dropped as reciprocal-of-held-out)
+  RGCN Epoch 25/150 | loss 0.0289 | val 0.0231
+  RGCN Epoch 50/150 | loss 0.0157 | val 0.0145
+  RGCN Epoch 75/150 | loss 0.0129 | val 0.0125
+  RGCN Epoch 100/150 | loss 0.0124 | val 0.0123
+  RGCN early stop at epoch 125 (best val loss 0.0099)
+  RGCN seed 7142: train 169.8s | fallback nodes: 124115 (75.2%)
+  split: 390035 train / 70679 held-out edges (10483 dropped as reciprocal-of-held-out)
+  GAT Epoch 25/150 | loss 0.3019 | val 0.1965
+  GAT Epoch 50/150 | loss 0.0969 | val 0.0439
+  GAT Epoch 75/150 | loss 0.0292 | val 0.0231
+  GAT early stop at epoch 95 (best val loss 0.0231)
+  GAT seed 7142: train 261.6s | fallback nodes: 124115 (75.2%)
+  split: 389952 train / 70679 held-out edges (10566 dropped as reciprocal-of-held-out)
+  RGCN Epoch 25/150 | loss 0.0356 | val 0.0242
+  RGCN Epoch 50/150 | loss 0.0160 | val 0.0152
+  RGCN Epoch 75/150 | loss 0.0103 | val 0.0109
+  RGCN early stop at epoch 91 (best val loss 0.0104)
+  RGCN seed 2718: train 97.3s | fallback nodes: 124086 (75.2%)
+  split: 389952 train / 70679 held-out edges (10566 dropped as reciprocal-of-held-out)
+  GAT Epoch 25/150 | loss 0.2154 | val 0.1034
+  GAT Epoch 50/150 | loss 0.0372 | val 0.0277
+  GAT Epoch 75/150 | loss 0.0319 | val 0.0242
+  GAT early stop at epoch 82 (best val loss 0.0221)
+  GAT seed 2718: train 207.8s | fallback nodes: 124086 (75.2%)
+  split: 389975 train / 70679 held-out edges (10543 dropped as reciprocal-of-held-out)
+  RGCN Epoch 25/150 | loss 0.0473 | val 0.0324
+  RGCN Epoch 50/150 | loss 0.0212 | val 0.0248
+  RGCN Epoch 75/150 | loss 0.0109 | val 0.0136
+  RGCN Epoch 100/150 | loss 0.0094 | val 0.0140
+  RGCN early stop at epoch 107 (best val loss 0.0132)
+  RGCN seed 3141: train 118.3s | fallback nodes: 124046 (75.1%)
+  split: 389975 train / 70679 held-out edges (10543 dropped as reciprocal-of-held-out)
+  GAT Epoch 25/150 | loss 0.4029 | val 1.9761
+  GAT Epoch 50/150 | loss 0.2222 | val 0.1372
+  GAT Epoch 75/150 | loss 0.1963 | val 0.0734
+  GAT Epoch 100/150 | loss 0.0763 | val 0.0340
+  GAT Epoch 125/150 | loss 0.0260 | val 0.0270
+  GAT early stop at epoch 133 (best val loss 0.0250)
+  GAT seed 3141: train 345.7s | fallback nodes: 124046 (75.1%)
+detector
+D1_D1_rule_1B       0.000
+D1_D1_rule_q50      0.000
+D1_D1_rule_q90      0.000
+D2_if_fin           0.500
+D3_if_fin_graph     0.400
+D4_scc_cycle        0.000
+D5_if_rgcn          0.433
+D6_if_gat           0.667
+D7_gat_link_err     0.000
+D7_rgcn_link_err    0.000
+
+============================================================
+RECALL@k: mean (sd) by detector and pattern
+============================================================
+                           mean                              std                            count                
+pattern          missing_trader   ring shell_pair missing_trader   ring shell_pair missing_trader ring shell_pair
+detector                                                                                                         
+D1_D1_rule_1B             0.000  0.000      0.000          0.000  0.000      0.000              2    2          2
+D1_D1_rule_q50            0.000  0.000      0.000          0.000  0.000      0.000              2    2          2
+D1_D1_rule_q90            0.000  0.000      0.000          0.000  0.000      0.000              2    2          2
+D2_if_fin                 0.550  0.200      0.050          0.071  0.000      0.071              2    2          2
+D3_if_fin_graph           0.450  0.300      0.200          0.071  0.000      0.000              2    2          2
+D4_scc_cycle              0.000  0.000      0.000          0.000  0.000      0.000              2    2          2
+D5_if_rgcn                0.483  0.700      0.667          0.172  0.155      0.216              6    6          6
+D6_if_gat                 0.683  0.983      0.967          0.183  0.041      0.082              6    6          6
+D7_gat_link_err           0.000  0.667      0.800          0.000  0.516      0.310              6    6          6
+D7_rgcn_link_err          0.017  0.250      0.183          0.041  0.187      0.183              6    6          6
+
+Saved: injection_benchmark_results.csv, injection_benchmark_summary.csv, injection/ground_truth.csv

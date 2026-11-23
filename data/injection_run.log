@@ -1,0 +1,104 @@
+============================================================
+Injection benchmark — BOND-style, EFRIS graph
+============================================================
+
+── Scenario ring_s101 ──
+Graph: 165104 nodes, 471177 edges
+  Taxpayer nodes (financial features): 624
+  Counterparty-only nodes: 164480
+  Node features: 13 (10 financial + 3 structural)
+  split: 389846 train / 70676 held-out edges (10655 dropped as reciprocal-of-held-out)
+  RGCN Epoch 25/150 | loss 0.0545 | val 0.0364
+  RGCN Epoch 50/150 | loss 0.0167 | val 0.0143
+  RGCN Epoch 75/150 | loss 0.0125 | val 0.0112
+  RGCN Epoch 100/150 | loss 0.0108 | val 0.0102
+  RGCN Epoch 125/150 | loss 0.0100 | val 0.0105
+  RGCN early stop at epoch 150 (best val loss 0.0101)
+  RGCN seed 7142: train 211.7s | fallback nodes: 124199 (75.2%)
+  split: 389846 train / 70676 held-out edges (10655 dropped as reciprocal-of-held-out)
+  GAT Epoch 25/150 | loss 0.6719 | val 1.7924
+  GAT Epoch 50/150 | loss 0.3147 | val 1.9068
+  GAT early stop at epoch 57 (best val loss 0.6304)
+  GAT seed 7142: train 175.4s | fallback nodes: 124199 (75.2%)
+ scenario         detector  k  n_injected  recall_at_k  precision_at_k  average_precision  best_rank_injected  worst_rank_injected
+ring_s101          D1_rule 10          10          0.0             0.0           0.016026                 615                  624
+ring_s101        D2_if_fin 10          10          0.2             0.2           0.216733                   5                   37
+ring_s101  D3_if_fin_graph 10          10          0.3             0.3           0.392038                   5                   18
+ring_s101     D4_scc_cycle 10          10          0.0             0.0           0.016077                 613                  622
+ring_s101       D5_if_rgcn 10          10          0.8             0.8           0.791025                   1                   12
+ring_s101        D6_if_gat 10          10          1.0             1.0           1.000000                   1                   10
+ring_s101 D7_rgcn_link_err 10          10          0.1             0.1           0.063040                   2                  536
+ring_s101  D7_gat_link_err 10          10          0.0             0.0           0.046664                  74                  157
+
+── Scenario shell_pair_s101 ──
+Graph: 165104 nodes, 471177 edges
+  Taxpayer nodes (financial features): 624
+  Counterparty-only nodes: 164480
+  Node features: 13 (10 financial + 3 structural)
+  split: 389846 train / 70676 held-out edges (10655 dropped as reciprocal-of-held-out)
+  RGCN Epoch 25/150 | loss 0.0518 | val 0.0356
+  RGCN Epoch 50/150 | loss 0.0185 | val 0.0121
+  RGCN Epoch 75/150 | loss 0.0141 | val 0.0090
+  RGCN Epoch 100/150 | loss 0.0110 | val 0.0083
+  RGCN Epoch 125/150 | loss 0.0097 | val 0.0086
+  RGCN early stop at epoch 128 (best val loss 0.0083)
+  RGCN seed 7142: train 170.5s | fallback nodes: 124199 (75.2%)
+  split: 389846 train / 70676 held-out edges (10655 dropped as reciprocal-of-held-out)
+  GAT Epoch 25/150 | loss 0.6697 | val 2.0030
+  GAT Epoch 50/150 | loss 0.3117 | val 2.3100
+  GAT early stop at epoch 57 (best val loss 0.5521)
+  GAT seed 7142: train 174.5s | fallback nodes: 124199 (75.2%)
+       scenario         detector  k  n_injected  recall_at_k  precision_at_k  average_precision  best_rank_injected  worst_rank_injected
+shell_pair_s101          D1_rule 10          10          0.0             0.0           0.016026                 615                  624
+shell_pair_s101        D2_if_fin 10          10          0.0             0.0           0.192598                  17                   39
+shell_pair_s101  D3_if_fin_graph 10          10          0.2             0.2           0.413492                   7                   18
+shell_pair_s101     D4_scc_cycle 10          10          0.0             0.0           0.016077                 613                  622
+shell_pair_s101       D5_if_rgcn 10          10          0.8             0.8           0.806667                   1                   12
+shell_pair_s101        D6_if_gat 10          10          1.0             1.0           1.000000                   1                   10
+shell_pair_s101 D7_rgcn_link_err 10          10          0.2             0.2           0.150065                   2                  382
+shell_pair_s101  D7_gat_link_err 10          10          0.0             0.0           0.088628                  29                   92
+
+── Scenario missing_trader_s101 ──
+Graph: 165104 nodes, 471197 edges
+  Taxpayer nodes (financial features): 624
+  Counterparty-only nodes: 164480
+  Node features: 13 (10 financial + 3 structural)
+  split: 390035 train / 70679 held-out edges (10483 dropped as reciprocal-of-held-out)
+  RGCN Epoch 25/150 | loss 0.0341 | val 0.0193
+  RGCN Epoch 50/150 | loss 0.0192 | val 0.0133
+  RGCN Epoch 75/150 | loss 0.0163 | val 0.0106
+  RGCN Epoch 100/150 | loss 0.0157 | val 0.0102
+  RGCN Epoch 125/150 | loss 0.0120 | val 0.0075
+  RGCN Epoch 150/150 | loss 0.0123 | val 0.0071
+  RGCN seed 7142: train 203.4s | fallback nodes: 124115 (75.2%)
+  split: 390035 train / 70679 held-out edges (10483 dropped as reciprocal-of-held-out)
+  GAT Epoch 25/150 | loss 0.2900 | val 0.1900
+  GAT Epoch 50/150 | loss 0.0774 | val 0.0395
+  GAT Epoch 75/150 | loss 0.0276 | val 0.0241
+  GAT early stop at epoch 88 (best val loss 0.0228)
+  GAT seed 7142: train 267.2s | fallback nodes: 124115 (75.2%)
+           scenario         detector  k  n_injected  recall_at_k  precision_at_k  average_precision  best_rank_injected  worst_rank_injected
+missing_trader_s101          D1_rule 10          10          0.0             0.0           0.016026                 615                  624
+missing_trader_s101        D2_if_fin 10          10          0.6             0.6           0.532708                   5                   14
+missing_trader_s101  D3_if_fin_graph 10          10          0.5             0.5           0.450135                   6                   17
+missing_trader_s101     D4_scc_cycle 10          10          0.0             0.0           0.016026                 613                  622
+missing_trader_s101       D5_if_rgcn 10          10          0.7             0.7           0.725465                   1                   14
+missing_trader_s101        D6_if_gat 10          10          0.8             0.8           0.848034                   1                   13
+missing_trader_s101 D7_rgcn_link_err 10          10          0.0             0.0           0.013742                  34                  621
+missing_trader_s101  D7_gat_link_err 10          10          0.1             0.1           0.050240                   6                  535
+
+============================================================
+MEAN RECALL@k BY DETECTOR AND PATTERN
+============================================================
+scenario          missing_trader_s101  ring_s101  shell_pair_s101
+detector                                                         
+D1_rule                           0.0        0.0              0.0
+D2_if_fin                         0.6        0.2              0.0
+D3_if_fin_graph                   0.5        0.3              0.2
+D4_scc_cycle                      0.0        0.0              0.0
+D5_if_rgcn                        0.7        0.8              0.8
+D6_if_gat                         0.8        1.0              1.0
+D7_gat_link_err                   0.1        0.0              0.0
+D7_rgcn_link_err                  0.0        0.1              0.2
+
+Saved: data/injection_benchmark_results.csv, data/injection/ground_truth.csv

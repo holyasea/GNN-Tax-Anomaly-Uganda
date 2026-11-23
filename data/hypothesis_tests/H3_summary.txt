@@ -1,0 +1,25 @@
+H3: Graph-model detection (RGCN & GAT vs Isolation Forest)
+============================================================
+Flag-group sizes (mutually exclusive partition):
+  IF_uniquely_flagged    n = 47
+  GNN_uniquely_flagged   n = 63
+  Consensus              n = 35
+  Non_flagged            n = 469
+
+Kruskal-Wallis tests across the four groups:
+  n_unique_partners        chi2 =   77.554, df = 3, p = 0.0000
+  purchase_to_sales_ratio  chi2 =    4.796, df = 3, p = 0.1873
+  var_purchase_value       chi2 =   13.059, df = 3, p = 0.0045
+
+Flag overlaps vs independence (hypergeometric / binomial):
+  IF & RGCN    observed = 13, expected = 6.2606, p = 0.0053
+  IF & GAT     observed =  8, expected = 6.2606, p = 0.2797
+  RGCN & GAT   observed = 26, expected = 6.2606, p = 0.0000
+  All three    observed =  6, expected = 0.6322, p = 0.0001
+
+Unique GNN flags (exactly one of RGCN/GAT, not IF): observed = 63, expected = 100.2.
+Decision rule: reject if the Kruskal-Wallis test is significant AND observed unique
+GNN flags exceed the expected number under random flagging.
+  Kruskal-Wallis significant (any feature): TRUE; unique GNN flags exceed expected: FALSE.
+DECISION: FAIL TO REJECT H3
+Interpretation: The flag groups differ structurally (smallest Kruskal-Wallis p = 0.0000), but the number of taxpayers uniquely flagged by the GNNs (63) does not exceed the independence expectation (100.2), so H3 is not rejected.

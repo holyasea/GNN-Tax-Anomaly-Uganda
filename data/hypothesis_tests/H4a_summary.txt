@@ -1,0 +1,19 @@
+H4a: Score independence (rev 2: top-k overlap primary, Spearman secondary)
+============================================================
+Top-62 overlap between model flag sets, tested against a permutation
+null (10000 permutations of one model's scores; p = P(perm >= obs)):
+  if_score vs rgcn_score   observed = 13, expected = 6.26, Jaccard = 0.117, p = 0.0065
+  if_score vs gat_score    observed =  8, expected = 6.26, Jaccard = 0.069, p = 0.2756
+  rgcn_score vs gat_score  observed = 26, expected = 6.26, Jaccard = 0.265, p = 0.0001
+
+Decision rule (rev 2): reject if any pair's top-k overlap exceeds the permutation
+null at 5%. Observed: at least one pair exceeds.
+DECISION: REJECT H4a
+
+Secondary (full-range Spearman; dominated by near-zero scores, ranks noise):
+  if_score vs rgcn_score   r = -0.1047, 95% CI [-0.1823, -0.0258]
+  if_score vs gat_score    r = +0.0382, 95% CI [-0.0411, +0.1170]
+  rgcn_score vs gat_score  r = +0.2333, 95% CI [+0.1571, +0.3067]
+
+Interpretation: the top-k overlap separates which model pairs share signal at
+the top of their rankings from pairs that do not; see hypothesis_report.md.

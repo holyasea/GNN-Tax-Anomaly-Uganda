@@ -1,0 +1,15 @@
+H4b: Consensus precision
+============================================================
+Each model flags its top 10% (n = 62 of 614).
+Observed consensus (flagged by >= 2 models): 35.
+Expected consensus under independence: 17.52 (p(>= 2) = 0.0285).
+Exact binomial test, P(X >= 35): p = 0.0001.
+Permutation test (10000 permutations of all three score vectors):
+  permuted consensus mean = 17.52 (SD 3.38); P(perm >= obs) = 0.0001.
+
+Total pairwise overlaps: observed = 47, expected under independence = 18.78.
+Poisson approximation for >= that many overlaps: p = 0.0000.
+
+Decision rule (rev 2): reject if the permutation p < 0.05.
+DECISION: REJECT H4b
+Interpretation: see hypothesis_report.md.

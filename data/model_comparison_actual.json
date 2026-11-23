@@ -1,0 +1,30 @@
+{
+  "seeds": [
+    7142,
+    2718,
+    3141
+  ],
+  "mask_ratio": 0.15,
+  "epochs_max": 150,
+  "patience": 20,
+  "graph": {
+    "nodes": 165094,
+    "edges": 471167,
+    "taxpayer_nodes": 614
+  },
+  "features": [
+    "total_sales",
+    "total_purchases",
+    "output_input_vat_ratio",
+    "n_unique_partners",
+    "avg_invoice_value",
+    "var_sale_value",
+    "var_purchase_value",
+    "purchase_to_sales_ratio",
+    "n_months_active_sales",
+    "n_months_active_purch",
+    "log_out_degree",
+    "log_in_degree",
+    "log_pagerank"
+  ]
+}

@@ -1,0 +1,15 @@
+H1: Network topology (rev 2: community structure only)
+============================================================
+Graph (simplified, undirected): 165094 nodes, 445730 edges.
+Observed Louvain modularity: 0.4874.
+Null (1,000 configuration-model graphs, same degree sequence): mean = 0.3676, SD = 0.0003.
+Modularity z-score = 438.2976; empirical p = 0.0010.
+
+Decision rule (rev 2): reject if empirical p < 0.05. The degree distribution is
+no longer part of the decision rule (that combined rule conflated two claims).
+DECISION: REJECT H1
+Interpretation: The transaction network shows significant, non-random community structure (modularity 0.4874 vs 0.3676 under the configuration-model null, z = 438.30). The degree distribution is heavy-tailed (alpha = 2.21); the bootstrap KS test rejects a pure power law (p = 0.0000), so the tail is best described as heavy-tailed rather than exactly power-law.
+
+H1b (descriptive, not a decision): power-law fit alpha = 2.2065 (xmin = 1,
+KS distance = 0.0202), bootstrap KS p = 0.0000. The pure power law is rejected,
+so the degree tail is heavy-tailed but not exactly power-law.

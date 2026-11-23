@@ -1,0 +1,42 @@
+
+===== H1: Network topology =====
+Observed modularity: 0.3468  (graph: 30173 nodes, 131980 edges)
+  null graph 200/1000
+  null graph 400/1000
+  null graph 600/1000
+  null graph 800/1000
+  null graph 1000/1000
+Parameters will be initially estimated via estimate_xmin
+Expected total run time for 100 sims, using 1 threads is 1220 seconds.
+
+===== H2: Baseline detection =====
+
+===== H3: Graph-model detection =====
+
+===== H4a: Score independence =====
+
+===== H4b: Consensus precision =====
+
+============================================================
+All hypothesis tests complete. Outputs written to: data/hypothesis_tests 
+   hypothesis_id                                         test_statistic p_value
+          <char>                                                 <char>  <char>
+1:            H1                                modularity z = 181.0347  0.0010
+2:            H2      3 of 5 features significant (min adj. p = 0.0000)  0.0000
+3:            H3 min KW p = 0.0000; unique GNN flags 73 vs 100 expected  0.0000
+4:           H4a                              max 95% CI upper = 0.1596  0.0000
+5:           H4b                observed consensus = 28 (expected 17.5)  0.0115
+         decision
+           <char>
+1: fail to reject
+2:         reject
+3: fail to reject
+4:         reject
+5:         reject
+                                                                                                                                                                                                                                                                 interpretation
+                                                                                                                                                                                                                                                                         <char>
+1: Community structure is strong (modularity 0.3468, z = 181.0347, empirical p = 0.0010), but the combined decision rule also requires the degree distribution to be consistent with a power law (KS p = 0.0000 > 0.10), which it is not; H1 is therefore not rejected in full.
+2:                                                                                                                                                        Isolation Forest flags taxpayers whose financial and structural profiles differ significantly from non-flagged peers.
+3:                                                         The flag groups differ structurally (smallest Kruskal-Wallis p = 0.0000), but the number of taxpayers uniquely flagged by the GNNs (73) does not exceed the independence expectation (100.2), so H3 is not rejected.
+4:                                                                                                                                                                          Pairwise model score correlations are near zero, so the models capture distinct anomaly dimensions.
+5:                                                                                                                                                       Consensus cases occur significantly more often than independence would predict, confirming non-random model agreement.

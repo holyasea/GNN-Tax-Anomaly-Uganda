@@ -1,0 +1,22 @@
+H2: Baseline detection (rev 3: held-out graph features)
+============================================================
+REV 1 TEST WAS CIRCULAR: comparing IF-flagged vs non-flagged taxpayers on
+IF's own training features is guaranteed to be significant and validates
+nothing. That comparison is retained as a descriptive profile only
+(H2_financial_profile_descriptive.csv); no decision rests on it.
+
+IF-flagged (top 10%): n = 62; non-flagged: n = 552.
+Held-out graph features IF never saw during training. Mann-Whitney U tests
+(two-sided), Benjamini-Hochberg corrected:
+
+feature                             p_raw          p_adj        sig          U
+log_out_degree                     0.0017         0.0029       TRUE    12962.5
+log_in_degree                      0.9092         0.9092      FALSE    16960.5
+page_rank                          0.5125         0.6406      FALSE    17980.0
+reciprocated_share                 0.0002         0.0004       TRUE    22082.5
+max_counterparty_share             0.0001         0.0004       TRUE    22236.0
+
+Significant held-out features (BH, 5%): 3 of 5.
+Decision rule: reject if at least three of five held-out features differ significantly.
+DECISION: REJECT H2
+Interpretation: IF flags are associated with anomalies on graph features outside the IF feature set, i.e. the flags generalize beyond the tautology of being extreme on their own training features.

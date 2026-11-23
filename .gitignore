@@ -1,0 +1,53 @@
+# ============================================================
+# .gitignore for GNN Tax Anomaly Detection (Uganda EFRIS)
+# ============================================================
+
+# --- Huge raw data files & extracts ---
+**/*.csv
+!data/auditor_review_blinded.csv
+!data/case_cards_consensus_flagged.csv
+!data/case_cards_control_matched.csv
+!data/injection_benchmark_summary.csv
+!data/robustness_contamination.csv
+!data/rule_baseline_zero_sales.csv
+!data/feature_importance_summary.csv
+!data/score_degree_correlation.csv
+!data/seed_stability.csv
+!data/temporal_analysis.csv
+!data/policy_revenue_at_risk.csv
+!data/model_comparison_actual.json
+
+# Binary data, chunks, and arrays
+**/*.RData*
+**/*.rdata*
+**/*.npy
+**/*.pt
+**/*.dta
+**/*.xlsx
+**/*.xls
+**/*.db
+**/*.tar.gz
+**/*.zip
+**/Sales_Chunk/
+**/_stale/
+
+# Python & R Cache
+**/.Rhistory
+**/.Rproj.user/
+**/__pycache__/
+**/*.pyc
+**/.posit/
+
+# LaTeX Auxiliary Files
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.synctex.gz
+paper/*.blg
+paper/*.toc
+paper/*.lof
+paper/*.lot
+
+# Keep compiled PDF and documents in paper/
+!paper/main.pdf
+!paper/*.docx

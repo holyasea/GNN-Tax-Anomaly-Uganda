@@ -1,0 +1,11 @@
+"feature","avg_abs_zscore","rank"
+"output_input_vat_ratio",103015.56270959,1
+"var_sale_value",127.902819572652,2
+"var_purchase_value",27.8754034922301,3
+"avg_invoice_value",11.4526964566057,4
+"total_sales",6.09910449613979,5
+"purchase_to_sales_ratio",5.55848745129596,6
+"total_purchases",3.91065380477038,7
+"n_months_active_purch",1.19597146544915,8
+"n_months_active_sales",0.865495748586593,9
+"n_unique_partners",0.79896096148002,10

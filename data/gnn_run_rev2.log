@@ -1,0 +1,100 @@
+============================================================
+EFRIS VAT Anomaly Detection — GNN Pipeline (rev. 2)
+============================================================
+Device: cpu | seeds: [7142, 2718, 3141] | mask: 0.15
+Graph: 165094 nodes, 471167 edges
+  Taxpayer nodes (financial features): 614
+  Counterparty-only nodes: 164480
+  Node features: 13 (10 financial + 3 structural)
+
+── Seed 7142 ──
+  split: 389891 train / 70675 held-out edges (10601 dropped as reciprocal-of-held-out)
+  RGCN Epoch 25/150 | loss 0.0430 | val 0.0271
+  RGCN Epoch 50/150 | loss 0.0164 | val 0.0124
+  RGCN Epoch 75/150 | loss 0.0127 | val 0.0109
+  RGCN Epoch 100/150 | loss 0.0102 | val 0.0095
+  RGCN early stop at epoch 123 (best val loss 0.0094)
+  RGCN seed 7142: train 183.2s | fallback nodes: 124200 (75.2%)
+  split: 389891 train / 70675 held-out edges (10601 dropped as reciprocal-of-held-out)
+  GAT Epoch 25/150 | loss 0.2579 | val 0.1297
+  GAT Epoch 50/150 | loss 0.0477 | val 0.0287
+  GAT early stop at epoch 68 (best val loss 0.0245)
+  GAT seed 7142: train 232.6s | fallback nodes: 124200 (75.2%)
+  k=3: silhouette=0.6678
+  k=5: silhouette=0.5304
+  k=7: silhouette=0.4965
+  k=10: silhouette=0.4550
+  GAT clustering: best k=3 (silhouette=0.6678)
+
+── Seed 2718 ──
+  split: 389946 train / 70675 held-out edges (10546 dropped as reciprocal-of-held-out)
+  RGCN Epoch 25/150 | loss 0.0416 | val 0.0234
+  RGCN Epoch 50/150 | loss 0.0177 | val 0.0135
+  RGCN Epoch 75/150 | loss 0.0125 | val 0.0103
+  RGCN Epoch 100/150 | loss 0.0124 | val 0.0094
+  RGCN Epoch 125/150 | loss 0.0099 | val 0.0083
+  RGCN Epoch 150/150 | loss 0.0088 | val 0.0080
+  RGCN seed 2718: train 155.8s | fallback nodes: 124212 (75.2%)
+  split: 389946 train / 70675 held-out edges (10546 dropped as reciprocal-of-held-out)
+  GAT Epoch 25/150 | loss 0.3194 | val 0.4760
+  GAT Epoch 50/150 | loss 0.3224 | val 0.1627
+  GAT Epoch 75/150 | loss 0.6672 | val 0.4456
+  GAT Epoch 100/150 | loss 0.1503 | val 0.0740
+  GAT Epoch 125/150 | loss 0.0980 | val 0.0293
+  GAT Epoch 150/150 | loss 0.0669 | val 0.0209
+  GAT seed 2718: train 502.2s | fallback nodes: 124212 (75.2%)
+
+── Seed 3141 ──
+  split: 389784 train / 70675 held-out edges (10708 dropped as reciprocal-of-held-out)
+  RGCN Epoch 25/150 | loss 0.0415 | val 0.0249
+  RGCN Epoch 50/150 | loss 0.0160 | val 0.0164
+  RGCN Epoch 75/150 | loss 0.0141 | val 0.0145
+  RGCN Epoch 100/150 | loss 0.0107 | val 0.0127
+  RGCN Epoch 125/150 | loss 0.0083 | val 0.0116
+  RGCN early stop at epoch 134 (best val loss 0.0112)
+  RGCN seed 3141: train 169.4s | fallback nodes: 124168 (75.2%)
+  split: 389784 train / 70675 held-out edges (10708 dropped as reciprocal-of-held-out)
+  GAT Epoch 25/150 | loss 0.4138 | val 0.2380
+  GAT Epoch 50/150 | loss 0.1289 | val 0.0334
+  GAT Epoch 75/150 | loss 0.0299 | val 0.0183
+  GAT early stop at epoch 80 (best val loss 0.0171)
+  GAT seed 3141: train 252.7s | fallback nodes: 124168 (75.2%)
+
+Seed stability (Spearman across seeds):
+model  seed_a  seed_b  spearman_all_nodes  spearman_taxpayers
+ rgcn    7142    2718            0.428041            0.404708
+ rgcn    7142    3141            0.368902            0.532285
+ rgcn    2718    3141            0.519271            0.505747
+  gat    7142    2718            0.515110            0.462945
+  gat    7142    3141            0.264546            0.018636
+  gat    2718    3141            0.284087            0.196944
+
+Score-degree correlations:
+model     scope  spearman_log_total_degree  spearman_log_in_degree  spearman_log_out_degree
+   if all_nodes                   0.128934                0.127137                 0.999995
+   if taxpayers                  -0.154034               -0.042482                -0.173962
+ rgcn all_nodes                  -0.242921               -0.243205                 0.087280
+ rgcn taxpayers                  -0.394256               -0.383469                -0.387384
+  gat all_nodes                  -0.603735               -0.603908                -0.013423
+  gat taxpayers                   0.080303               -0.046415                 0.098105
+
+============================================================
+SUMMARY (taxpayer nodes only, seed-averaged scores)
+============================================================
+
+Isolation Forest: range [0.3255, 0.7633], mean 0.3973, sd 0.0708
+  top 10%: 62 | top 5%: 31
+
+RGCN: range [0.0000, 0.4892], mean 0.0078, sd 0.0274
+  top 10%: 62 | top 5%: 31
+
+GAT: range [0.0000, 0.3274], mean 0.0025, sd 0.0181
+  top 10%: 62 | top 5%: 31
+
+Top-10% overlap:
+  IF & RGCN:  13
+  IF & GAT:   8
+  RGCN & GAT: 26
+  All three:  6
+
+All results saved to data/

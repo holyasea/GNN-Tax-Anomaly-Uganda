@@ -1,0 +1,13 @@
+,mean,mean,mean,std,std,std,count,count,count
+pattern,missing_trader,ring,shell_pair,missing_trader,ring,shell_pair,missing_trader,ring,shell_pair
+detector,,,,,,,,,
+D1_D1_rule_1B,0.0,0.0,0.0,0.0,0.0,0.0,2,2,2
+D1_D1_rule_q50,0.0,0.0,0.0,0.0,0.0,0.0,2,2,2
+D1_D1_rule_q90,0.0,0.0,0.0,0.0,0.0,0.0,2,2,2
+D2_if_fin,0.55,0.2,0.05,0.071,0.0,0.071,2,2,2
+D3_if_fin_graph,0.45,0.3,0.2,0.071,0.0,0.0,2,2,2
+D4_scc_cycle,0.0,0.0,0.0,0.0,0.0,0.0,2,2,2
+D5_if_rgcn,0.483,0.7,0.667,0.172,0.155,0.216,6,6,6
+D6_if_gat,0.683,0.983,0.967,0.183,0.041,0.082,6,6,6
+D7_gat_link_err,0.0,0.667,0.8,0.0,0.516,0.31,6,6,6
+D7_rgcn_link_err,0.017,0.25,0.183,0.041,0.187,0.183,6,6,6
