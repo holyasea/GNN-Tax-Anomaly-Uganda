@@ -2,7 +2,15 @@
 # .gitignore for GNN Tax Anomaly Detection (Uganda EFRIS)
 # ============================================================
 
-# --- Huge raw data files & extracts ---
+# --- 1. Ignore All Unrelated Files & Folders in the Root ---
+/*
+!/.gitignore
+!/README.md
+!/LICENSE
+!/data/
+!/paper/
+
+# --- 2. Confidential & Heavy Raw Data Files in data/ ---
 **/*.csv
 !data/auditor_review_blinded.csv
 !data/case_cards_consensus_flagged.csv
@@ -17,7 +25,7 @@
 !data/policy_revenue_at_risk.csv
 !data/model_comparison_actual.json
 
-# Binary data, chunks, and arrays
+# --- 3. Heavy Binary Data, Chunks, and Embeddings ---
 **/*.RData*
 **/*.rdata*
 **/*.npy
@@ -31,14 +39,14 @@
 **/Sales_Chunk/
 **/_stale/
 
-# Python & R Cache
+# --- 4. Python, R, and IDE Caches ---
 **/.Rhistory
 **/.Rproj.user/
 **/__pycache__/
 **/*.pyc
 **/.posit/
 
-# LaTeX Auxiliary Files
+# --- 5. LaTeX Build Artifacts ---
 paper/*.aux
 paper/*.log
 paper/*.out
@@ -48,6 +56,6 @@ paper/*.toc
 paper/*.lof
 paper/*.lot
 
-# Keep compiled PDF and documents in paper/
+# Keep deliverables in paper/
 !paper/main.pdf
 !paper/*.docx
