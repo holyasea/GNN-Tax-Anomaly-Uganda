@@ -153,24 +153,28 @@ def create_ura_summary_document(output_path):
     )
 
     # -------------------------------------------------------------
-    # 4. REPOSITORY LINK
+    # 4. REPOSITORY & RESEARCH PAPER LINK
     # -------------------------------------------------------------
     p_h2 = doc.add_paragraph()
     format_spacing(p_h2, before_pt=12, after_pt=4, line_mult=1.15)
-    r_h2 = p_h2.add_run("Online Repository and Source Code")
+    r_h2 = p_h2.add_run("Access Full Research Paper & Code Repository")
     r_h2.bold = True
     r_h2.font.size = Pt(12)
     r_h2.font.color.rgb = COLOR_NAVY
 
     p_link = doc.add_paragraph()
     format_spacing(p_link, before_pt=0, after_pt=14, line_mult=1.15)
-    p_link.add_run("The complete dissertation, methodology, and computational workflows are available at:\n")
-    
-    r_url = p_link.add_run("https://github.com/holyweek/GNN-Tax-Anomaly-Uganda")
-    r_url.bold = True
-    r_url.font.color.rgb = COLOR_LINK
-    r_url.underline = True
-    p_link.add_run("  [Update with your working GitHub repository link]")
+    p_link.add_run("• Full Working Paper (PDF): ")
+    r_url1 = p_link.add_run("https://github.com/holyasea/GNN-Tax-Anomaly-Uganda/blob/main/paper/main.pdf\n")
+    r_url1.bold = True
+    r_url1.font.color.rgb = COLOR_LINK
+    r_url1.underline = True
+
+    p_link.add_run("• Source Code & Documentation: ")
+    r_url2 = p_link.add_run("https://github.com/holyasea/GNN-Tax-Anomaly-Uganda")
+    r_url2.bold = True
+    r_url2.font.color.rgb = COLOR_LINK
+    r_url2.underline = True
 
     # -------------------------------------------------------------
     # 5. KEY OPERATIONAL TAKEAWAYS (FOR AUDITORS & RISK MANAGERS)
@@ -223,5 +227,5 @@ def create_ura_summary_document(output_path):
         print(f"Primary file was open in Word. Saved updated document to: {alt_path}")
 
 if __name__ == "__main__":
-    out = r"C:\Users\Holyweek\Desktop\Latex\URA_Research_Summary_EFRIS_GNN.docx"
+    out = r"D:\Research Project\Project\Project1\paper\URA_Research_Summary_EFRIS_GNN.docx"
     create_ura_summary_document(out)
